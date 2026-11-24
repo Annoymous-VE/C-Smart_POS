@@ -30,10 +30,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for Vite dev server and localhost
+# Enable CORS for Vercel, local dev, and all subdomains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8000",
+        "https://frontend-seven-orcin-27.vercel.app"
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,7 +53,7 @@ def health_check():
         "status": "healthy",
         "service": "DRC Smart POS Backend",
         "version": "1.0.0",
-        "environment": "demo-local"
+        "environment": "production"
     }
 
 # Register API Routers under /api/v1
@@ -60,7 +67,7 @@ app.include_router(expenses.router, prefix="/api/v1")
 app.include_router(reports.router, prefix="/api/v1")
 app.include_router(fiscal.router, prefix="/api/v1")
 
-# Mount built frontend SPA if frontend/dist exists
+# Mount built frontend SPA if frontend/dist exists (for local single-server serving)
 frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
 if os.path.exists(frontend_dist):
     app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")

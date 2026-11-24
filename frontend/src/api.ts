@@ -1,7 +1,23 @@
 import { DashboardSummary, Product, Sale, Purchase, Customer, Supplier, Expense, FiscalInvoice } from './types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ||
-  (typeof window !== 'undefined' && window.location.port === '8000' ? '/api/v1' : 'http://127.0.0.1:8000/api/v1');
+// Resolve Backend API base URL
+const envUrl = (import.meta as any).env?.VITE_API_BASE_URL;
+
+let API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+
+if (envUrl) {
+  API_BASE_URL = envUrl.replace(/\/+$/, '');
+  if (!API_BASE_URL.endsWith('/api/v1')) {
+    API_BASE_URL += '/api/v1';
+  }
+} else if (typeof window !== 'undefined') {
+  if (window.location.hostname.includes('vercel.app')) {
+    // Automatically use the live Render backend when running on Vercel
+    API_BASE_URL = 'https://c-smart-pos.onrender.com/api/v1';
+  } else if (window.location.port === '8000') {
+    API_BASE_URL = '/api/v1';
+  }
+}
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
