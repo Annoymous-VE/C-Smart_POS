@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans antialiased;
+  }
+}
+
+/* Thermal printer simulation styles */
+@media print {
+  /* Hide UI elements during print */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 2mm;
+    background: white;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .print-area-58mm {
+    width: 58mm !important;
+    font-size: 10px !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,244 @@
+Client message : 
+Create a demo based on "I am looking for an experienced software developer or development company to develop DRC Smart POS, a professional, secure, and commercially marketable Point of Sale (POS) and Fiscal Management Software designed specifically for the Democratic Republic of Congo (DRC). The software should include sales and inventory management, purchase management, customer and supplier management, expense tracking, financial reports, DGI-compliant invoicing (Facture Normalisée), tax management, user roles and permissions, and business analytics. It should support Android, Windows/Web platforms, offline and online operations, and 58mm/80mm Bluetooth and USB ythermal printers. The system must have a modern interface, secure database, scalable architecture, and complete source code. The objective is to launch a reliable commercial product that can be licensed and sold to businesses across the DRC."
+
+Detailed module structure
+I recommend dividing the platform into 18 functional modules, grouped into six major business areas.
+
+A. Core business management
+M01. Dashboard & Business Overview
+
+Daily, weekly and monthly sales.
+Total revenue and gross profit.
+Today's transactions.
+Cash, bank and mobile payment summaries.
+Low-stock and out-of-stock alerts.
+Outstanding customer payments.
+Expense and profit analysis.
+Branch-wise performance.
+M02. POS & Sales Management
+
+Barcode and SKU-based product scanning.
+Quick product search.
+Cart and checkout management.
+Discounts and promotional pricing.
+Multiple payment methods.
+Split payments and partial payments.
+Cash, card, bank and mobile money.
+Sales returns and refunds.
+Quotations and sales orders.
+Customer purchase history.
+Cashier-wise sales tracking.
+M03. Inventory & Stock Management
+
+Product and category management.
+Product variants and attributes.
+Barcode generation.
+Stock in and stock out.
+Real-time inventory updates.
+Stock adjustment and correction.
+Minimum stock alerts.
+Batch and expiry tracking.
+Stock transfer between branches.
+Inventory valuation.
+Damaged and expired stock management.
+Physical stock reconciliation.
+M04. Purchase & Procurement Management
+
+Purchase requests.
+Purchase orders.
+Supplier quotations.
+Goods receiving.
+Purchase invoices.
+Partial goods receiving.
+Purchase returns.
+Supplier payment tracking.
+Purchase cost and margin analysis.
+Automatic inventory updates.
+M05. Customer Management (CRM)
+
+Customer profiles.
+Customer contact details.
+NIF and business information.
+Credit limits.
+Customer outstanding balances.
+Payment history.
+Customer transaction history.
+Customer segmentation.
+Loyalty points and rewards.
+M06. Supplier Management
+
+Supplier profiles.
+RCCM and NIF details.
+Supplier contacts.
+Purchase history.
+Outstanding supplier balances.
+Supplier payment records.
+Supplier performance analysis.
+
+B. Financial and fiscal management
+M07. Expense Management
+
+Expense categories.
+Daily operational expenses.
+Rent, salaries, utilities and transport.
+Expense approvals.
+Expense attachments and receipts.
+Recurring expenses.
+Cash expense tracking.
+Expense reports.
+M08. Financial & Accounting Management
+
+Chart of accounts.
+General ledger.
+Journal entries.
+Accounts receivable.
+Accounts payable.
+Cashbook.
+Bank accounts and reconciliation.
+Trial balance.
+Profit and loss statement.
+Balance sheet.
+Cash flow statement.
+Financial year closing.
+M09. Tax & VAT Management
+
+DRC tax configuration.
+VAT rate management.
+Taxable and non-taxable products.
+Tax group configuration.
+Tax-inclusive and tax-exclusive pricing.
+VAT calculation.
+Sales and purchase tax reports.
+Tax period summaries.
+Tax configuration history.
+Exportable tax reports.
+M10. DGI Facture Normalisée & Fiscal Management
+
+This is the most critical specialized module.
+
+Fiscal invoice generation.
+DGI-required invoice information.
+Integration with approved DEF (UF/MCF) mechanisms.
+Fiscal transaction authentication.
+QR code generation.
+Fiscal invoice serial management.
+Fiscal transaction verification.
+Credit notes and cancellation workflows as legally permitted.
+Fiscal transmission and synchronization.
+Failed fiscal transaction monitoring.
+Fiscal audit logs.
+DGI compliance reporting.
+
+C. Administration and operational management
+M11. User, Roles & Permissions
+
+Super Administrator.
+Business Owner.
+Branch Manager.
+Store Manager.
+Accountant.
+Inventory Manager.
+Cashier.
+Sales Representative.
+Custom roles.
+Module-level access control.
+Action-level permissions.
+Approval workflows.
+Login and activity history.
+M12. Multi-Branch & Multi-Store Management
+
+Multiple business entities.
+Multiple branches.
+Multiple POS terminals.
+Centralized product catalog.
+Branch-specific inventory.
+Branch-specific pricing.
+Inter-branch stock transfers.
+Consolidated financial reports.
+Branch-level user permissions.
+M13. Hardware & Printer Management
+
+58mm thermal printers.
+80mm thermal printers.
+Bluetooth printer connectivity.
+USB printer connectivity.
+ESC/POS command support.
+Receipt templates.
+Logo printing.
+QR code printing.
+Cash drawer integration.
+Barcode scanner integration.
+Printer configuration and testing.
+M14. Offline & Online Synchronization
+
+Local SQLite database.
+Offline sales processing.
+Offline product lookup.
+Local transaction storage.
+Background synchronization.
+Automatic retry mechanism.
+Duplicate transaction prevention.
+Conflict resolution.
+Sync status dashboard.
+Centralized cloud backup.
+Device-level synchronization logs.
+
+D. Reporting and business intelligence
+M15. Reports & Business Analytics
+
+Sales reports.
+Product-wise profitability.
+Cashier-wise performance.
+Branch-wise revenue.
+Inventory valuation.
+Stock movement reports.
+Purchase reports.
+Expense reports.
+Profit and loss.
+Customer outstanding reports.
+Supplier outstanding reports.
+VAT and fiscal reports.
+Custom date range reports.
+Excel and PDF exports.
+
+E. Commercial product management
+M16. Subscription & License Management
+
+Free trial management.
+Monthly and annual subscriptions.
+License activation.
+Device registration.
+Branch-based licensing.
+Subscription expiry notifications.
+License renewal.
+Feature-based subscription plans.
+Payment tracking.
+License suspension and reactivation.
+M17. Super Admin & Tenant Management
+
+Business/customer registration.
+Tenant creation.
+Tenant isolation.
+Business verification.
+Subscription monitoring.
+Tenant configuration.
+Global product configuration.
+Support access.
+System-wide activity monitoring.
+Platform usage analytics.
+
+F. Security and system administration
+M18. Security, Audit & System Configuration
+
+Secure authentication.
+Password policies.
+Two-factor authentication.
+Encrypted data transmission.
+Database encryption and backup.
+Audit trails.
+Failed login monitoring.
+Session management.
+API access control.
+Data retention policies.
+System health monitoring.
+Disaster recovery.
