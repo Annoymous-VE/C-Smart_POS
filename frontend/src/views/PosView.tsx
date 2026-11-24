@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Product, Customer, Sale } from '../types';
 import { formatMoney, formatDate } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName, translateCategory, translateUnit, translateCustomerName } from '../i18n';
 import {
   Search,
   Barcode,
@@ -39,7 +39,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | undefined>(undefined);
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tous');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [barcodeInput, setBarcodeInput] = useState('');
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -72,14 +72,15 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
   }, [branchId]);
 
   // Categories
-  const allLabel = lang === 'fr' ? 'Tous' : 'All';
-  const categories = [allLabel, ...Array.from(new Set(products.map(p => p.category)))];
+  const rawCategories = Array.from(new Set(products.map(p => p.category)));
+  const categories = ['ALL', ...rawCategories];
 
   // Filtered products
   const filteredProducts = products.filter(p => {
-    const matchesCategory = selectedCategory === allLabel || selectedCategory === 'Tous' || selectedCategory === 'All' || p.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'ALL' || selectedCategory === 'Tous' || selectedCategory === 'All' || p.category === selectedCategory;
     const matchesSearch = search === '' ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||
+      translateProductName(p.name, lang).toLowerCase().includes(search.toLowerCase()) ||
       p.sku.toLowerCase().includes(search.toLowerCase()) ||
       (p.barcode && p.barcode.includes(search));
     return matchesCategory && matchesSearch;
@@ -88,7 +89,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
   // Add product to cart
   const addToCart = (product: Product) => {
     if (product.stock_quantity <= 0) {
-      alert(lang === 'fr' ? `Le produit "${product.name}" est en rupture de stock!` : `Product "${product.name}" is out of stock!`);
+      alert(lang === 'fr' ? `Le produit "${product.name}" est en rupture de stock!` : `Product "${translateProductName(product.name, lang)}" is out of stock!`);
       return;
     }
 
@@ -235,19 +236,23 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
 
         {/* Category Pills */}
         <div className="flex gap-1.5 overflow-x-auto pb-3 mb-2 scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
-                (selectedCategory === cat || (cat === allLabel && (selectedCategory === 'Tous' || selectedCategory === 'All')))
-                  ? 'bg-teal-700 text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat || (cat === 'ALL' && (selectedCategory === 'Tous' || selectedCategory === 'All'));
+            const label = cat === 'ALL' ? (lang === 'fr' ? 'Tous' : 'All') : translateCategory(cat, lang);
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                  isSelected
+                    ? 'bg-teal-700 text-white shadow-sm'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Product Grid */}
@@ -276,12 +281,12 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
                         <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">{t.statusLow}</span>
                       ) : (
                         <span className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">
-                          {product.stock_quantity} {product.unit}
+                          {product.stock_quantity} {translateUnit(product.unit, lang)}
                         </span>
                       )}
                     </div>
                     <h3 className="text-xs font-semibold text-slate-900 line-clamp-2 leading-tight">
-                      {product.name}
+                      {translateProductName(product.name, lang)}
                     </h3>
                   </div>
 
@@ -334,7 +339,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
               <option value="">{t.walkInCustomer}</option>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name} {c.nif ? `(NIF: ${c.nif})` : ''}
+                  {translateCustomerName(c.name, lang)} {c.nif ? `(NIF: ${c.nif})` : ''}
                 </option>
               ))}
             </select>
@@ -353,7 +358,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
             cart.map((item) => (
               <div key={item.product.id} className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/50 flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-800 truncate">{item.product.name}</p>
+                  <p className="text-xs font-semibold text-slate-800 truncate">{translateProductName(item.product.name, lang)}</p>
                   <p className="text-[11px] text-slate-500">
                     {formatMoney(item.product.selling_price, currency)} × {item.quantity}
                   </p>
@@ -536,7 +541,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
                   <p>{lang === 'fr' ? 'Facture:' : 'Invoice:'} <span className="font-bold">{completedSale.invoice_number}</span></p>
                   <p>Date: {formatDate(completedSale.created_at)}</p>
                   <p>{lang === 'fr' ? 'Caisse: Caisse 01 | Caissier:' : 'Register: POS 01 | Cashier:'} {completedSale.cashier_name}</p>
-                  <p>{lang === 'fr' ? 'Client:' : 'Customer:'} {completedSale.customer_name || t.walkInCustomer}</p>
+                  <p>{lang === 'fr' ? 'Client:' : 'Customer:'} {translateCustomerName(completedSale.customer_name, lang) || t.walkInCustomer}</p>
                   <p>{lang === 'fr' ? 'Règlement:' : 'Payment:'} {completedSale.payment_method}</p>
                 </div>
 
@@ -549,7 +554,7 @@ export const PosView: React.FC<PosViewProps> = ({ branchId, currency, lang, isOf
                   {completedSale.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-[10px] mb-0.5">
                       <span className="truncate pr-1">
-                        {item.quantity}× {item.product_name_snapshot}
+                        {item.quantity}× {translateProductName(item.product_name_snapshot, lang)}
                       </span>
                       <span className="font-semibold">${item.line_total.toFixed(2)}</span>
                     </div>

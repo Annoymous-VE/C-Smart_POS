@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { formatMoney } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName, translateExpenseCategory } from '../i18n';
 import { BarChart3, Download } from 'lucide-react';
 
 interface ReportsViewProps {
@@ -86,7 +86,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ branchId, currency, la
               <tbody className="divide-y divide-slate-100">
                 {(report?.top_selling_products || []).map((p: any, idx: number) => (
                   <tr key={idx}>
-                    <td className="py-2.5 px-3 font-semibold text-slate-800">{p.name}</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-800">{translateProductName(p.name, lang)}</td>
                     <td className="py-2.5 px-3 text-right font-bold text-slate-900">{p.quantity_sold}</td>
                     <td className="py-2.5 px-3 text-right text-teal-700 font-bold">{formatMoney(p.revenue, currency)}</td>
                   </tr>
@@ -106,7 +106,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ branchId, currency, la
               return (
                 <div key={cat} className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="font-medium text-slate-700">{cat}</span>
+                    <span className="font-medium text-slate-700">{translateExpenseCategory(cat, lang)}</span>
                     <span className="font-bold text-slate-900">{formatMoney(amount, currency)} ({percent}%)</span>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">

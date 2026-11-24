@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../api';
 import { DashboardSummary } from '../types';
 import { formatMoney, formatDate } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName, translateCategory, translateUnit, translateCustomerName } from '../i18n';
 import {
   TrendingUp,
   DollarSign,
@@ -244,10 +244,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ branchId, currency
               <tbody className="divide-y divide-slate-100">
                 {(summary?.low_stock_products || []).map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="py-2.5 px-3 font-medium text-slate-800">{p.name}</td>
+                    <td className="py-2.5 px-3 font-medium text-slate-800">{translateProductName(p.name, lang)}</td>
                     <td className="py-2.5 px-3 text-slate-500 font-mono text-[11px]">{p.sku}</td>
-                    <td className="py-2.5 px-3 text-slate-600">{p.category}</td>
-                    <td className="py-2.5 px-3 text-right font-bold text-slate-900">{p.stock_quantity} {p.unit}</td>
+                    <td className="py-2.5 px-3 text-slate-600">{translateCategory(p.category, lang)}</td>
+                    <td className="py-2.5 px-3 text-right font-bold text-slate-900">{p.stock_quantity} {translateUnit(p.unit, lang)}</td>
                     <td className="py-2.5 px-3 text-right text-slate-500">{p.minimum_stock}</td>
                     <td className="py-2.5 px-3 text-center">
                       {p.stock_quantity <= 0 ? (
@@ -302,7 +302,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ branchId, currency
                 <tr key={sale.id} className="hover:bg-slate-50">
                   <td className="py-2.5 px-3 font-mono font-semibold text-slate-800">{sale.invoice_number}</td>
                   <td className="py-2.5 px-3 text-slate-500">{formatDate(sale.created_at)}</td>
-                  <td className="py-2.5 px-3 text-slate-700 font-medium">{sale.customer_name || t.walkInCustomer}</td>
+                  <td className="py-2.5 px-3 text-slate-700 font-medium">{translateCustomerName(sale.customer_name, lang) || t.walkInCustomer}</td>
                   <td className="py-2.5 px-3">
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700">
                       {sale.payment_method}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Sale, FiscalInvoice } from '../types';
 import { formatMoney, formatDate } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName, translateCustomerName } from '../i18n';
 import { FileCheck2, Printer, ShieldAlert, QrCode } from 'lucide-react';
 
 interface FiscalInvoiceViewProps {
@@ -82,7 +82,7 @@ export const FiscalInvoiceView: React.FC<FiscalInvoiceViewProps> = ({ currency, 
         >
           {sales.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.invoice_number} — {s.customer_name || t.walkInCustomer} ({formatMoney(s.total, currency)}) - {formatDate(s.created_at)}
+              {s.invoice_number} — {translateCustomerName(s.customer_name, lang) || t.walkInCustomer} ({formatMoney(s.total, currency)}) - {formatDate(s.created_at)}
             </option>
           ))}
         </select>
@@ -123,7 +123,7 @@ export const FiscalInvoiceView: React.FC<FiscalInvoiceViewProps> = ({ currency, 
           <div className="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
             <div>
               <p className="font-bold text-slate-500 uppercase text-[10px] tracking-wider mb-1">{t.customerBilled}</p>
-              <p className="font-bold text-slate-900 text-sm">{fiscalData.customer.name}</p>
+              <p className="font-bold text-slate-900 text-sm">{translateCustomerName(fiscalData.customer.name, lang)}</p>
               <p className="text-slate-600 mt-0.5">{fiscalData.customer.address}</p>
               <p className="text-slate-600">{t.colPhone}: {fiscalData.customer.phone}</p>
               <p className="font-mono text-teal-800 font-semibold mt-1">
@@ -156,7 +156,7 @@ export const FiscalInvoiceView: React.FC<FiscalInvoiceViewProps> = ({ currency, 
               <tbody className="divide-y divide-slate-200">
                 {fiscalData.line_items.map((item, idx) => (
                   <tr key={idx}>
-                    <td className="py-2.5 px-3 font-semibold text-slate-900">{item.product_name}</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{translateProductName(item.product_name, lang)}</td>
                     <td className="py-2.5 px-2 text-right">{item.quantity}</td>
                     <td className="py-2.5 px-3 text-right text-slate-600">${item.unit_price.toFixed(2)}</td>
                     <td className="py-2.5 px-2 text-center font-mono font-medium">{item.tax_rate_percent}%</td>

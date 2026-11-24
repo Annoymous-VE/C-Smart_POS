@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Purchase, Supplier, Product } from '../types';
 import { formatMoney, formatDate } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName } from '../i18n';
 import {
   Truck,
   Plus,
@@ -175,7 +175,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ currency, lang }) 
                   <tbody className="divide-y divide-slate-50">
                     {po.items.map((item, idx) => (
                       <tr key={idx}>
-                        <td className="py-2 px-3 font-medium text-slate-800">{item.product_name_snapshot}</td>
+                        <td className="py-2 px-3 font-medium text-slate-800">{translateProductName(item.product_name_snapshot, lang)}</td>
                         <td className="py-2 px-3 text-right font-bold text-slate-900">{item.quantity}</td>
                         <td className="py-2 px-3 text-right text-slate-600">{formatMoney(item.unit_cost, currency)}</td>
                         <td className="py-2 px-3 text-right font-bold text-slate-900">{formatMoney(item.line_total, currency)}</td>
@@ -249,7 +249,7 @@ export const PurchasesView: React.FC<PurchasesViewProps> = ({ currency, lang }) 
                       className="flex-1 p-1.5 border border-slate-200 rounded text-xs"
                     >
                       {products.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
+                        <option key={p.id} value={p.id}>{translateProductName(p.name, lang)}</option>
                       ))}
                     </select>
 

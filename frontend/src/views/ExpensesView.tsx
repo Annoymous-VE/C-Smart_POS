@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Expense } from '../types';
 import { formatMoney, formatDate } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateExpenseCategory } from '../i18n';
 import { Receipt, Plus, X } from 'lucide-react';
 
 interface ExpensesViewProps {
@@ -121,7 +121,7 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({ currency, lang }) =>
                 <td className="py-3 px-4 text-slate-500">{formatDate(e.expense_date)}</td>
                 <td className="py-3 px-3">
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700">
-                    {e.category}
+                    {translateExpenseCategory(e.category, lang)}
                   </span>
                 </td>
                 <td className="py-3 px-3 font-medium text-slate-800">{e.description}</td>

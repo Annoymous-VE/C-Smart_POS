@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Customer } from '../types';
 import { formatMoney } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateCustomerName } from '../i18n';
 import { Users, Search, Plus, X } from 'lucide-react';
 
 interface CustomersViewProps {
@@ -100,7 +100,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ currency, lang }) 
           <tbody className="divide-y divide-slate-100">
             {customers.map((c) => (
               <tr key={c.id} className="hover:bg-slate-50">
-                <td className="py-3 px-4 font-bold text-slate-900">{c.name}</td>
+                <td className="py-3 px-4 font-bold text-slate-900">{translateCustomerName(c.name, lang)}</td>
                 <td className="py-3 px-3 font-mono text-[11px] text-teal-800 font-semibold">
                   {c.nif || <span className="text-slate-400 font-normal">{lang === 'fr' ? 'Non assujetti' : 'Non-registered'}</span>}
                 </td>

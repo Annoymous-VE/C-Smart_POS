@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Product } from '../types';
 import { formatMoney } from '../utils';
-import { Language, translations } from '../i18n';
+import { Language, translations, translateProductName, translateCategory, translateUnit } from '../i18n';
 import {
   Package,
   Search,
@@ -150,10 +150,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ currency, lang }) 
             className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700"
           >
             <option value="">{t.allCategories}</option>
-            <option value="Alimentation">{lang === 'fr' ? 'Alimentation' : 'Food & Staples'}</option>
-            <option value="Boissons">{lang === 'fr' ? 'Boissons' : 'Beverages'}</option>
-            <option value="Électronique">{lang === 'fr' ? 'Électronique' : 'Electronics'}</option>
-            <option value="Hygiène">{lang === 'fr' ? 'Hygiène' : 'Household & Personal Care'}</option>
+            <option value="Alimentation">{translateCategory('Alimentation', lang)}</option>
+            <option value="Boissons">{translateCategory('Boissons', lang)}</option>
+            <option value="Électronique">{translateCategory('Électronique', lang)}</option>
+            <option value="Hygiène">{translateCategory('Hygiène', lang)}</option>
           </select>
 
           <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer select-none">
@@ -192,16 +192,16 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ currency, lang }) 
 
                 return (
                   <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="py-3 px-4 font-semibold text-slate-900">{p.name}</td>
+                    <td className="py-3 px-4 font-semibold text-slate-900">{translateProductName(p.name, lang)}</td>
                     <td className="py-3 px-3 font-mono text-[11px] text-slate-500">
                       <div>{p.sku}</div>
                       {p.barcode && <div className="text-slate-400 text-[10px]">{p.barcode}</div>}
                     </td>
-                    <td className="py-3 px-3 text-slate-600">{p.category}</td>
+                    <td className="py-3 px-3 text-slate-600">{translateCategory(p.category, lang)}</td>
                     <td className="py-3 px-3 text-right text-slate-500">{formatMoney(p.cost_price, currency)}</td>
                     <td className="py-3 px-3 text-right font-bold text-slate-900">{formatMoney(p.selling_price, currency)}</td>
                     <td className="py-3 px-3 text-right font-bold text-slate-800">
-                      {p.stock_quantity} <span className="font-normal text-[10px] text-slate-400">{p.unit}</span>
+                      {p.stock_quantity} <span className="font-normal text-[10px] text-slate-400">{translateUnit(p.unit, lang)}</span>
                     </td>
                     <td className="py-3 px-3 text-right text-slate-400">{p.minimum_stock}</td>
                     <td className="py-3 px-3 text-center">
@@ -252,8 +252,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ currency, lang }) 
 
             <form onSubmit={handleAdjustStock} className="space-y-3 text-xs">
               <div>
-                <p className="font-medium text-slate-700">{t.colProduct}: <span className="font-bold text-slate-900">{adjustModalProduct.name}</span></p>
-                <p className="text-slate-500">{t.colInStock}: <span className="font-bold text-slate-800">{adjustModalProduct.stock_quantity}</span> {adjustModalProduct.unit}</p>
+                <p className="font-medium text-slate-700">{t.colProduct}: <span className="font-bold text-slate-900">{translateProductName(adjustModalProduct.name, lang)}</span></p>
+                <p className="text-slate-500">{t.colInStock}: <span className="font-bold text-slate-800">{adjustModalProduct.stock_quantity}</span> {translateUnit(adjustModalProduct.unit, lang)}</p>
               </div>
 
               <div>

@@ -517,3 +517,84 @@ export const translations = {
     securityAuditTitle: "Security & Audit Event Trail",
   }
 };
+
+// Seed & Database Catalog Dictionaries for dynamic translation
+export const categoryTranslations: Record<string, Record<Language, string>> = {
+  "Alimentation": { fr: "Alimentation", en: "Food & Staples" },
+  "Boissons": { fr: "Boissons", en: "Beverages" },
+  "Électronique": { fr: "Électronique", en: "Electronics" },
+  "Hygiène": { fr: "Hygiène", en: "Household & Personal Care" },
+};
+
+export const unitTranslations: Record<string, Record<Language, string>> = {
+  "Sac": { fr: "Sac", en: "Bag" },
+  "Bidon": { fr: "Bidon", en: "Can / Jug" },
+  "Boîte": { fr: "Boîte", en: "Box" },
+  "Casier": { fr: "Casier", en: "Crate" },
+  "Pack": { fr: "Pack", en: "Pack" },
+  "Pièce": { fr: "Pièce", en: "Piece" },
+  "Sachet": { fr: "Sachet", en: "Pouch" },
+  "Kit": { fr: "Kit", en: "Kit" },
+};
+
+export const productTranslations: Record<string, Record<Language, string>> = {
+  "Riz Blanc Parfumé 25kg": { fr: "Riz Blanc Parfumé 25kg", en: "Scented White Rice 25kg" },
+  "Farine de Froment Bralima 50kg": { fr: "Farine de Froment Bralima 50kg", en: "Bralima Wheat Flour 50kg" },
+  "Huile Végétale Simba 5L": { fr: "Huile Végétale Simba 5L", en: "Simba Vegetable Cooking Oil 5L" },
+  "Sucre Blanc Kwilu Ngongo 5kg": { fr: "Sucre Blanc Kwilu Ngongo 5kg", en: "Kwilu Ngongo White Sugar 5kg" },
+  "Lait Concentré Sucré Bonnet Bleu 397g": { fr: "Lait Concentré Sucré Bonnet Bleu 397g", en: "Bonnet Bleu Sweetened Condensed Milk 397g" },
+  "Primus Bouteille 72cl Casier 12": { fr: "Primus Bouteille 72cl Casier 12", en: "Primus Beer 72cl Crate 12" },
+  "Maltina Canette 33cl Pack 24": { fr: "Maltina Canette 33cl Pack 24", en: "Maltina Can 33cl Pack 24" },
+  "Eau Minérale Swissta 1.5L Pack 6": { fr: "Eau Minérale Swissta 1.5L Pack 6", en: "Swissta Mineral Water 1.5L Pack 6" },
+  "Routeur 4G LTE Wi-Fi Mobile": { fr: "Routeur 4G LTE Wi-Fi Mobile", en: "Mobile 4G LTE Wi-Fi Router" },
+  "Câble USB-C Tressé Rapide 1.5m": { fr: "Câble USB-C Tressé Rapide 1.5m", en: "Fast Braided USB-C Cable 1.5m" },
+  "Ampoule LED Rechargeable 15W": { fr: "Ampoule LED Rechargeable 15W", en: "15W Rechargeable LED Bulb" },
+  "Kit Solaire Portable 50W": { fr: "Kit Solaire Portable 50W", en: "50W Portable Solar Kit" },
+  "Savon Antiseptique Monganga Boîte 12": { fr: "Savon Antiseptique Monganga Boîte 12", en: "Monganga Antiseptic Soap Box 12" },
+  "Détergent Omo Poudre 500g": { fr: "Détergent Omo Poudre 500g", en: "Omo Washing Powder Detergent 500g" },
+};
+
+export const expenseCategoryTranslations: Record<string, Record<Language, string>> = {
+  "Groupe Électrogène & Carburant": { fr: "Groupe Électrogène & Carburant", en: "Generator & Fuel" },
+  "Loyer & Charges": { fr: "Loyer & Charges", en: "Rent & Maintenance" },
+  "Électricité & Eau": { fr: "Électricité & Eau", en: "Utilities (Electricity & Water)" },
+  "Logistique & Transport": { fr: "Logistique & Transport", en: "Logistics & Transport" },
+  "Télécoms & Internet": { fr: "Télécoms & Internet", en: "Telecom & Internet" },
+  "Fournitures de Bureau": { fr: "Fournitures de Bureau", en: "Office Supplies" },
+};
+
+export const customerTranslations: Record<string, Record<Language, string>> = {
+  "Client Comptant (Particulier)": { fr: "Client Comptant (Particulier)", en: "Walk-in Customer (Individual)" },
+  "Client Comptant / Particulier": { fr: "Client Comptant / Particulier", en: "Walk-in Customer / Individual" },
+};
+
+export function translateProductName(name?: string, lang: Language = 'fr'): string {
+  if (!name) return '';
+  if (lang === 'fr') return name;
+  return productTranslations[name]?.en || name;
+}
+
+export function translateCategory(category?: string, lang: Language = 'fr'): string {
+  if (!category) return '';
+  if (lang === 'fr') return category;
+  return categoryTranslations[category]?.en || category;
+}
+
+export function translateUnit(unit?: string, lang: Language = 'fr'): string {
+  if (!unit) return '';
+  if (lang === 'fr') return unit;
+  return unitTranslations[unit]?.en || unit;
+}
+
+export function translateExpenseCategory(category?: string, lang: Language = 'fr'): string {
+  if (!category) return '';
+  if (lang === 'fr') return category;
+  return expenseCategoryTranslations[category]?.en || category;
+}
+
+export function translateCustomerName(name?: string, lang: Language = 'fr'): string {
+  if (!name) return '';
+  if (lang === 'fr') return name;
+  return customerTranslations[name]?.en || name;
+}
+
