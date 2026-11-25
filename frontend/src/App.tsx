@@ -63,7 +63,7 @@ export function App() {
           onRefreshData={handleRefresh}
         />
 
-        <main key={refreshKey} className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+        <main key={refreshKey} className="flex-1 flex flex-col overflow-hidden bg-[#F5F7FA]">
           {currentTab === 'dashboard' && (
             <DashboardView
               branchId={branchId}

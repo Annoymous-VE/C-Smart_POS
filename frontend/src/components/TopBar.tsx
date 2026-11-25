@@ -32,15 +32,15 @@ export const TopBar: React.FC<TopBarProps> = ({
   const t = translations[lang];
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between text-sm shadow-sm select-none z-10">
+    <header className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between text-xs shadow-sm select-none z-10">
       {/* Left: Branch selector & Store indicator */}
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-lg border border-slate-200">
-          <Store className="w-4 h-4 text-teal-700" />
+      <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2 bg-[#F5F7FA] py-1.5 px-3 rounded-lg border border-slate-200 hover:border-slate-300 transition">
+          <Store className="w-4 h-4 text-[#0D9488]" />
           <select
             value={branchId}
             onChange={(e) => onBranchChange(Number(e.target.value))}
-            className="bg-transparent text-xs font-semibold text-slate-800 outline-none cursor-pointer"
+            className="bg-transparent text-xs font-semibold text-slate-800 outline-none cursor-pointer pr-1"
           >
             <option value={1}>{t.branchGombe}</option>
             <option value={2}>{t.branchLimete}</option>
@@ -52,7 +52,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <button
             onClick={onRefreshData}
             title="Rafraîchir / Refresh"
-            className="p-1.5 text-slate-500 hover:text-teal-700 hover:bg-slate-100 rounded-md transition"
+            className="p-1.5 text-slate-500 hover:text-[#0D9488] hover:bg-slate-100 rounded-lg transition border border-transparent hover:border-slate-200"
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
@@ -60,17 +60,17 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right: Language Switcher, Currency toggle, Offline simulation, Role selector */}
-      <div className="flex items-center space-x-3">
-        {/* Language Converter Toggle */}
-        <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs">
-          <div className="pl-2 pr-1 text-slate-500 flex items-center">
+      <div className="flex items-center space-x-2.5">
+        {/* Language Converter Segmented Control */}
+        <div className="flex items-center bg-[#F5F7FA] rounded-lg p-0.5 border border-slate-200 text-xs">
+          <div className="pl-2 pr-1 text-slate-400 flex items-center">
             <Languages className="w-3.5 h-3.5" />
           </div>
           <button
             onClick={() => onLangChange('fr')}
-            className={`px-2 py-1 rounded-md font-semibold transition ${
+            className={`px-2 py-1 rounded-md font-bold text-[11px] transition ${
               lang === 'fr'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-[#0D9488] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
             title="Français (RDC)"
@@ -79,9 +79,9 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
           <button
             onClick={() => onLangChange('en')}
-            className={`px-2 py-1 rounded-md font-semibold transition ${
+            className={`px-2 py-1 rounded-md font-bold text-[11px] transition ${
               lang === 'en'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-[#0D9488] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
             title="English"
@@ -90,13 +90,13 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         </div>
 
-        {/* Currency Switcher */}
-        <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs">
+        {/* Currency Switcher Segmented Control */}
+        <div className="flex items-center bg-[#F5F7FA] rounded-lg p-0.5 border border-slate-200 text-xs font-mono">
           <button
             onClick={() => onCurrencyChange('USD')}
-            className={`px-2.5 py-1 rounded-md font-semibold transition ${
+            className={`px-2.5 py-1 rounded-md font-bold text-[11px] transition ${
               currency === 'USD'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-[#0D9488] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -104,9 +104,9 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
           <button
             onClick={() => onCurrencyChange('CDF')}
-            className={`px-2.5 py-1 rounded-md font-semibold transition ${
+            className={`px-2.5 py-1 rounded-md font-bold text-[11px] transition ${
               currency === 'CDF'
-                ? 'bg-teal-700 text-white shadow-sm'
+                ? 'bg-[#0D9488] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -117,9 +117,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Demo Offline Toggle */}
         <button
           onClick={onToggleOffline}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition ${
             isOfflineDemo
-              ? 'bg-amber-100 text-amber-900 border-amber-300'
+              ? 'bg-amber-50 text-amber-900 border-amber-300'
               : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
           }`}
           title="Basculer le mode Hors-ligne / Toggle Offline Demo"
@@ -138,12 +138,12 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* Role Switcher */}
-        <div className="flex items-center gap-1.5 bg-slate-100 py-1.5 px-2.5 rounded-lg border border-slate-200 text-xs">
-          <UserCheck className="w-3.5 h-3.5 text-slate-600" />
+        <div className="flex items-center gap-1.5 bg-[#F5F7FA] py-1.5 px-2.5 rounded-lg border border-slate-200 text-xs hover:border-slate-300 transition">
+          <UserCheck className="w-3.5 h-3.5 text-slate-500" />
           <select
             value={userRole}
             onChange={(e) => onUserRoleChange(e.target.value)}
-            className="bg-transparent font-medium text-slate-700 outline-none cursor-pointer"
+            className="bg-transparent font-semibold text-slate-700 outline-none cursor-pointer pr-1"
           >
             <option value="Caissier (Jeanne Kalala)">{t.roleCashier}</option>
             <option value="Directeur Commercial (Patrick Tshisekedi)">{t.roleOwner}</option>

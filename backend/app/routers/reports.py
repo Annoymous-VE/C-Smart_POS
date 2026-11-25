@@ -60,7 +60,8 @@ def get_reports_summary(
         "total_transactions": len(sales),
         "top_selling_products": top_products,
         "payment_methods": payments,
-        "expense_categories": exp_by_cat
+        "expense_categories": exp_by_cat,
+        "expenses_by_category": exp_by_cat
     }
 
 @router.get("/export/csv")
