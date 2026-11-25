@@ -1,6 +1,6 @@
 import io
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
@@ -18,9 +18,29 @@ def get_reports_summary(
 ):
     sales_q = db.query(Sale).filter(Sale.status == "COMPLETED")
     expenses_q = db.query(Expense)
+    items_q = db.query(SaleItem).join(Sale).filter(Sale.status == "COMPLETED")
 
     if branch_id:
         sales_q = sales_q.filter(Sale.branch_id == branch_id)
+        items_q = items_q.filter(Sale.branch_id == branch_id)
+
+    if start_date:
+        try:
+            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+            sales_q = sales_q.filter(Sale.created_at >= start_dt)
+            expenses_q = expenses_q.filter(Expense.expense_date >= start_dt)
+            items_q = items_q.filter(Sale.created_at >= start_dt)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end_dt = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            sales_q = sales_q.filter(Sale.created_at < end_dt)
+            expenses_q = expenses_q.filter(Expense.expense_date < end_dt)
+            items_q = items_q.filter(Sale.created_at < end_dt)
+        except ValueError:
+            pass
 
     sales = sales_q.all()
     expenses = expenses_q.all()
@@ -30,7 +50,7 @@ def get_reports_summary(
     total_expenses = sum(e.amount for e in expenses)
 
     # Top products by sales volume
-    items = db.query(SaleItem).join(Sale).filter(Sale.status == "COMPLETED").all()
+    items = items_q.all()
     product_stats = {}
     for itm in items:
         p_name = itm.product_name_snapshot
@@ -52,6 +72,45 @@ def get_reports_summary(
     for e in expenses:
         exp_by_cat[e.category] = round(exp_by_cat.get(e.category, 0.0) + e.amount, 2)
 
+    # Determine trend granularity based on requested timeframe
+    granularity = "day"
+    if start_date and end_date and start_date == end_date:
+        granularity = "hour"
+    elif not start_date and not end_date:
+        all_dates = [s.created_at for s in sales if s.created_at] + [e.expense_date for e in expenses if e.expense_date]
+        if all_dates and (max(all_dates) - min(all_dates)).days > 35:
+            granularity = "week"
+
+    def bucket_key(dt: datetime) -> str:
+        if granularity == "hour":
+            return dt.strftime("%H:00")
+        if granularity == "week":
+            iso_year, iso_week, _ = dt.isocalendar()
+            return f"{iso_year}-W{iso_week:02d}"
+        return dt.strftime("%Y-%m-%d")
+
+    # Trend grouping (revenue vs expenses)
+    daily_map = {}
+    for s in sales:
+        if s.created_at:
+            d_key = bucket_key(s.created_at)
+            if d_key not in daily_map:
+                daily_map[d_key] = {"date": d_key, "revenue": 0.0, "expenses": 0.0}
+            daily_map[d_key]["revenue"] = round(daily_map[d_key]["revenue"] + s.total, 2)
+
+    for e in expenses:
+        if e.expense_date:
+            d_key = bucket_key(e.expense_date)
+            if d_key not in daily_map:
+                daily_map[d_key] = {"date": d_key, "revenue": 0.0, "expenses": 0.0}
+            daily_map[d_key]["expenses"] = round(daily_map[d_key]["expenses"] + e.amount, 2)
+
+    daily_trend = []
+    for d_key in sorted(daily_map.keys()):
+        entry = daily_map[d_key]
+        entry["net_margin"] = round(entry["revenue"] - entry["expenses"], 2)
+        daily_trend.append(entry)
+
     return {
         "total_sales": round(total_sales, 2),
         "total_tax_collected": round(total_tax, 2),
@@ -61,7 +120,9 @@ def get_reports_summary(
         "top_selling_products": top_products,
         "payment_methods": payments,
         "expense_categories": exp_by_cat,
-        "expenses_by_category": exp_by_cat
+        "expenses_by_category": exp_by_cat,
+        "daily_trend": daily_trend,
+        "granularity": granularity
     }
 
 @router.get("/export/csv")

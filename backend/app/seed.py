@@ -161,6 +161,58 @@ def seed_database(db: Session):
                 {"product": products_map["ELEC-LED15"], "quantity": 2, "discount": 0.0}
             ]
         },
+        # 8-30 days ago
+        {
+            "offset_hours": 24 * 12,
+            "customer_id": customers[0].id,
+            "branch_id": branch_gombe.id,
+            "payment_method": "M-Pesa",
+            "items": [
+                {"product": products_map["FAR-50KG"], "quantity": 4, "discount": 0.0},
+                {"product": products_map["SUC-5KG"], "quantity": 6, "discount": 0.0}
+            ]
+        },
+        {
+            "offset_hours": 24 * 19,
+            "customer_id": customers[2].id,
+            "branch_id": branch_gombe.id,
+            "payment_method": "Airtel Money",
+            "items": [
+                {"product": products_map["BEV-PRI72"], "quantity": 8, "discount": 10.0},
+                {"product": products_map["BEV-EAU6"], "quantity": 10, "discount": 0.0}
+            ]
+        },
+        {
+            "offset_hours": 24 * 25,
+            "customer_id": customers[1].id,
+            "branch_id": branch_limete.id,
+            "payment_method": "Cash",
+            "items": [
+                {"product": products_map["RIZ-25KG"], "quantity": 5, "discount": 0.0},
+                {"product": products_map["HUI-5L"], "quantity": 4, "discount": 0.0}
+            ]
+        },
+        # 31-60 days ago
+        {
+            "offset_hours": 24 * 38,
+            "customer_id": customers[3].id,
+            "branch_id": branch_gombe.id,
+            "payment_method": "Card",
+            "items": [
+                {"product": products_map["SOL-50W"], "quantity": 3, "discount": 10.0},
+                {"product": products_map["ELEC-RT4G"], "quantity": 2, "discount": 0.0}
+            ]
+        },
+        {
+            "offset_hours": 24 * 52,
+            "customer_id": customers[0].id,
+            "branch_id": branch_gombe.id,
+            "payment_method": "Orange Money",
+            "items": [
+                {"product": products_map["RIZ-25KG"], "quantity": 6, "discount": 0.0},
+                {"product": products_map["SAV-MON12"], "quantity": 5, "discount": 0.0}
+            ]
+        },
     ]
 
     for idx, sale_data in enumerate(sample_sales, start=1):
@@ -310,6 +362,10 @@ def seed_database(db: Session):
         {"category": "Logistique & Transport", "description": "Frais de transport camionnette livraison Limete vers Gombe", "amount": 60.0, "currency": "USD", "payment_method": "Cash", "days_ago": 0},
         {"category": "Télécoms & Internet", "description": "Abonnement Internet Fibre Optique Vodacom Business", "amount": 120.0, "currency": "USD", "payment_method": "Airtel Money", "days_ago": 2},
         {"category": "Fournitures de Bureau", "description": "Carton rouleaux papier thermique 80mm pour caisse", "amount": 45.0, "currency": "USD", "payment_method": "Cash", "days_ago": 1},
+        {"category": "Groupe Électrogène & Carburant", "description": "Appoint carburant groupe électrogène (Quinzaine)", "amount": 160.0, "currency": "USD", "payment_method": "Cash", "days_ago": 14},
+        {"category": "Logistique & Transport", "description": "Livraison entrepôt Kingabwa -> Gombe", "amount": 85.0, "currency": "USD", "payment_method": "M-Pesa", "days_ago": 21},
+        {"category": "Loyer & Charges", "description": "Loyer commercial mensuel - Mois précédent", "amount": 1200.0, "currency": "USD", "payment_method": "Bank Transfer", "days_ago": 35},
+        {"category": "Électricité & Eau", "description": "Facture SNEL & REGIDESO - Mois précédent", "amount": 135.0, "currency": "USD", "payment_method": "M-Pesa", "days_ago": 45},
     ]
 
     for exp in expenses_data:

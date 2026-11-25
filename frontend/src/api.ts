@@ -1,4 +1,4 @@
-import { DashboardSummary, Product, Sale, Purchase, Customer, Supplier, Expense, FiscalInvoice } from './types';
+import { DashboardSummary, Product, Sale, Purchase, Customer, Supplier, Expense, FiscalInvoice, ReportSummary } from './types';
 
 // Resolve Backend API base URL
 const envUrl = (import.meta as any).env?.VITE_API_BASE_URL;
@@ -167,9 +167,13 @@ export const api = {
   },
 
   // Reports
-  getReportsSummary: (branchId?: number) => {
-    const query = branchId ? `?branch_id=${branchId}` : '';
-    return request<any>(`/reports/summary${query}`);
+  getReportsSummary: (branchId?: number, startDate?: string, endDate?: string) => {
+    const query = new URLSearchParams();
+    if (branchId) query.append('branch_id', String(branchId));
+    if (startDate) query.append('start_date', startDate);
+    if (endDate) query.append('end_date', endDate);
+    const qs = query.toString();
+    return request<ReportSummary>(`/reports/summary${qs ? `?${qs}` : ''}`);
   },
 
   exportSalesCsvUrl: `${API_BASE_URL}/reports/export/csv`,

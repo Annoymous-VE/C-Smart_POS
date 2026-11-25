@@ -155,3 +155,28 @@ export interface FiscalInvoice {
   }>;
   cashier: string;
 }
+
+export interface DailyTrendPoint {
+  date: string;
+  revenue: number;
+  expenses: number;
+  net_margin: number;
+}
+
+export interface ReportSummary {
+  total_sales: number;
+  total_tax_collected: number;
+  total_expenses: number;
+  net_estimated_margin: number;
+  total_transactions: number;
+  top_selling_products: Array<{
+    name: string;
+    quantity_sold: number;
+    revenue: number;
+  }>;
+  payment_methods: Record<string, number>;
+  expense_categories: Record<string, number>;
+  expenses_by_category: Record<string, number>;
+  daily_trend: DailyTrendPoint[];
+  granularity?: 'hour' | 'day' | 'week';
+}
