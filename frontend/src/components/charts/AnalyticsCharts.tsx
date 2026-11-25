@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DailyTrendPoint } from '../../types';
 import { formatMoney } from '../../utils';
 
@@ -13,6 +13,11 @@ const PALETTE = [
   '#64748B', // Slate 500
 ];
 
+export interface BreakdownItem {
+  label: string;
+  value: number;
+}
+
 interface TrendChartProps {
   data: DailyTrendPoint[];
   currency: string;
@@ -26,6 +31,23 @@ interface TrendChartProps {
 
 export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, labels }) => {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [animateIn, setAnimateIn] = useState<boolean>(false);
+
+  const dataSignature = (data || [])
+    .map((d) => `${d.date}:${d.revenue}:${d.expenses}`)
+    .join('|');
+
+  useEffect(() => {
+    setAnimateIn(false);
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setAnimateIn(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [dataSignature]);
 
   if (!data || data.length === 0) {
     return (
@@ -75,8 +97,8 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
 
   return (
     <div className="space-y-3">
-      {/* Legend & Hover Readout */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+      {/* Legend & Hover Readout (fixed height to prevent layout shift) */}
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs min-h-[28px]">
         <div className="flex items-center gap-4">
           <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
             <span className="w-2.5 h-2.5 rounded-sm bg-[#0D9488]" />
@@ -92,16 +114,22 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
           </span>
         </div>
 
-        {hovered && (
-          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] font-mono">
-            <span className="font-semibold text-slate-700">{hovered.date}</span>
-            <span className="text-[#0D9488] font-bold">+{formatMoney(hovered.revenue, currency)}</span>
-            <span className="text-rose-600 font-bold">-{formatMoney(hovered.expenses, currency)}</span>
-            <span className={hovered.net_margin >= 0 ? 'text-sky-700 font-bold' : 'text-rose-700 font-bold'}>
-              {formatMoney(hovered.net_margin, currency)}
-            </span>
-          </div>
-        )}
+        <div
+          className={`flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] font-mono transition-opacity duration-150 ${
+            hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          <span className="font-semibold text-slate-700">{hovered ? hovered.date : '—'}</span>
+          <span className="text-[#0D9488] font-bold">
+            +{formatMoney(hovered ? hovered.revenue : 0, currency)}
+          </span>
+          <span className="text-rose-600 font-bold">
+            -{formatMoney(hovered ? hovered.expenses : 0, currency)}
+          </span>
+          <span className={hovered && hovered.net_margin < 0 ? 'text-rose-700 font-bold' : 'text-sky-700 font-bold'}>
+            {formatMoney(hovered ? hovered.net_margin : 0, currency)}
+          </span>
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto">
@@ -110,8 +138,8 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
           className="w-full min-w-[460px] h-56 select-none"
           role="img"
           aria-label={labels.revenue}
+          onMouseLeave={() => setHoverIdx(null)}
         >
-          {/* Horizontal gridlines & Y labels */}
           {yTicks.map((tick, i) => (
             <g key={i}>
               <line
@@ -136,7 +164,6 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
             </g>
           ))}
 
-          {/* Grouped Bars */}
           {data.map((d, idx) => {
             const cx = pad.left + groupWidth * idx + groupWidth / 2;
             const revH = (d.revenue / niceMax) * plotH;
@@ -147,20 +174,28 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
               <g
                 key={d.date}
                 onMouseEnter={() => setHoverIdx(idx)}
-                onMouseLeave={() => setHoverIdx(null)}
                 className="cursor-pointer"
               >
-                {/* Hover column highlight */}
+                {/* Contiguous invisible hit target so there is no dead gap between dates */}
+                <rect
+                  x={pad.left + groupWidth * idx}
+                  y={pad.top}
+                  width={groupWidth}
+                  height={plotH}
+                  fill="transparent"
+                />
+                {/* Visual column highlight */}
                 <rect
                   x={pad.left + groupWidth * idx + 2}
                   y={pad.top}
                   width={Math.max(4, groupWidth - 4)}
                   height={plotH}
                   rx={4}
-                  fill={isHovered ? '#F1F5F9' : 'transparent'}
+                  fill="#F1F5F9"
+                  opacity={isHovered ? 1 : 0}
+                  className="transition-opacity duration-150 pointer-events-none"
                 />
 
-                {/* Revenue Bar */}
                 <rect
                   x={cx - barWidth - 1.5}
                   y={pad.top + plotH - revH}
@@ -169,9 +204,13 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
                   rx={3}
                   fill="#0D9488"
                   opacity={hoverIdx === null || isHovered ? 0.92 : 0.45}
+                  style={{
+                    transform: animateIn ? 'scaleY(1)' : 'scaleY(0)',
+                    transformOrigin: `0px ${pad.top + plotH}px`,
+                    transition: 'transform 450ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease',
+                  }}
                 />
 
-                {/* Expenses Bar */}
                 <rect
                   x={cx + 1.5}
                   y={pad.top + plotH - expH}
@@ -180,9 +219,13 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
                   rx={3}
                   fill="#E11D48"
                   opacity={hoverIdx === null || isHovered ? 0.88 : 0.45}
+                  style={{
+                    transform: animateIn ? 'scaleY(1)' : 'scaleY(0)',
+                    transformOrigin: `0px ${pad.top + plotH}px`,
+                    transition: 'transform 450ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease',
+                  }}
                 />
 
-                {/* X-Axis Date Label */}
                 {(data.length <= 12 || idx % Math.ceil(data.length / 10) === 0) && (
                   <text
                     x={cx}
@@ -197,7 +240,6 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
             );
           })}
 
-          {/* Net Margin Line Overlay */}
           {data.length > 1 && (
             <polyline
               fill="none"
@@ -210,7 +252,6 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
             />
           )}
 
-          {/* Line Nodes */}
           {data.map((d, idx) => {
             const cx = pad.left + groupWidth * idx + groupWidth / 2;
             const clamped = Math.max(0, d.net_margin);
@@ -234,11 +275,6 @@ export const TrendBarLineChart: React.FC<TrendChartProps> = ({ data, currency, l
     </div>
   );
 };
-
-export interface BreakdownItem {
-  label: string;
-  value: number;
-}
 
 interface DonutChartProps {
   items: BreakdownItem[];
@@ -312,7 +348,6 @@ export const DonutChart: React.FC<DonutChartProps> = ({
           })}
         </svg>
 
-        {/* Center Readout */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-3 pointer-events-none">
           <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">
             {activeIdx !== null ? validItems[activeIdx].label : totalLabel}
@@ -323,7 +358,6 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex-1 w-full space-y-2">
         {validItems.map((item, idx) => {
           const pct = Math.round((item.value / total) * 100);
@@ -408,6 +442,273 @@ export const HorizontalBarList: React.FC<HorizontalBarListProps> = ({
           </div>
         );
       })}
+    </div>
+  );
+};
+
+interface PieChartProps {
+  items: BreakdownItem[];
+  currency: string;
+  totalLabel: string;
+  noDataLabel: string;
+}
+
+export const PieChart: React.FC<PieChartProps> = ({
+  items,
+  currency,
+  totalLabel,
+  noDataLabel,
+}) => {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const validItems = items
+    .filter((i) => i.value > 0)
+    .sort((a, b) => b.value - a.value);
+  const total = validItems.reduce((acc, i) => acc + i.value, 0);
+
+  if (validItems.length === 0 || total <= 0) {
+    return (
+      <div className="h-44 flex items-center justify-center text-xs text-slate-400">
+        {noDataLabel}
+      </div>
+    );
+  }
+
+  const size = 164;
+  const r = 36;
+  const strokeWidth = 72; // 2 * r fills the circle completely to the center
+  const circumference = 2 * Math.PI * r;
+
+  let cumulativeOffset = 0;
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center gap-6">
+      <div className="relative shrink-0" style={{ width: size, height: size }}>
+        <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full -rotate-90 select-none">
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke="#F1F5F9"
+            strokeWidth={strokeWidth}
+          />
+          {validItems.map((item, idx) => {
+            const fraction = item.value / total;
+            const dashLength = fraction * circumference;
+            const dashOffset = -cumulativeOffset;
+            cumulativeOffset += dashLength;
+            const color = PALETTE[idx % PALETTE.length];
+            const isActive = activeIdx === idx;
+            const gap = validItems.length > 1 ? 1.2 : 0;
+
+            return (
+              <circle
+                key={item.label}
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                fill="none"
+                stroke={color}
+                strokeWidth={isActive ? strokeWidth + 6 : strokeWidth}
+                strokeDasharray={`${Math.max(0, dashLength - gap)} ${circumference}`}
+                strokeDashoffset={dashOffset}
+                opacity={activeIdx === null || isActive ? 1 : 0.45}
+                className="transition-all duration-300 ease-out cursor-pointer"
+                onMouseEnter={() => setActiveIdx(idx)}
+                onMouseLeave={() => setActiveIdx(null)}
+              />
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex-1 w-full space-y-1.5">
+        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2 pb-1 border-b border-slate-100">
+          <span>{totalLabel}</span>
+          <span className="font-mono text-slate-700">{formatMoney(total, currency)}</span>
+        </div>
+        {validItems.map((item, idx) => {
+          const pct = Math.round((item.value / total) * 100);
+          const color = PALETTE[idx % PALETTE.length];
+          const isActive = activeIdx === idx;
+          return (
+            <div
+              key={item.label}
+              onMouseEnter={() => setActiveIdx(idx)}
+              onMouseLeave={() => setActiveIdx(null)}
+              className={`flex items-center justify-between text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                isActive ? 'bg-slate-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="font-medium text-slate-700 truncate">{item.label}</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 font-mono">
+                <span className="text-slate-400 text-[11px]">{pct}%</span>
+                <span className="font-semibold text-slate-900">{formatMoney(item.value, currency)}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+interface VerticalBarChartProps {
+  items: BreakdownItem[];
+  currency: string;
+  noDataLabel: string;
+}
+
+export const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
+  items,
+  currency,
+  noDataLabel,
+}) => {
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [animateIn, setAnimateIn] = useState<boolean>(false);
+
+  const validItems = items
+    .filter((i) => i.value > 0)
+    .sort((a, b) => b.value - a.value);
+  const total = validItems.reduce((acc, i) => acc + i.value, 0);
+
+  const itemsSignature = validItems.map((i) => `${i.label}:${i.value}`).join('|');
+
+  useEffect(() => {
+    setAnimateIn(false);
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setAnimateIn(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [itemsSignature]);
+
+  if (validItems.length === 0 || total <= 0) {
+    return (
+      <div className="h-44 flex items-center justify-center text-xs text-slate-400">
+        {noDataLabel}
+      </div>
+    );
+  }
+
+  const width = 460;
+  const height = 210;
+  const pad = { top: 26, right: 16, bottom: 32, left: 56 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+
+  const maxVal = Math.max(10, ...validItems.map((i) => i.value));
+  const niceMax = Math.ceil(maxVal * 1.18);
+
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => ({
+    val: niceMax * t,
+    y: pad.top + plotH - plotH * t,
+  }));
+
+  const slotW = plotW / validItems.length;
+  const barW = Math.min(44, Math.max(20, slotW * 0.52));
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full min-w-[340px] h-52 select-none"
+        role="img"
+        onMouseLeave={() => setHoverIdx(null)}
+      >
+        {yTicks.map((tick, i) => (
+          <g key={i}>
+            <line
+              x1={pad.left}
+              x2={width - pad.right}
+              y1={tick.y}
+              y2={tick.y}
+              stroke="#E2E8F0"
+              strokeDasharray={i === 0 ? undefined : '3 3'}
+              strokeWidth="1"
+            />
+            <text
+              x={pad.left - 8}
+              y={tick.y + 3.5}
+              textAnchor="end"
+              className="fill-slate-400 text-[10px] font-mono"
+            >
+              {currency === 'CDF'
+                ? `${Math.round((tick.val * 2850) / 1000)}k`
+                : `$${Math.round(tick.val)}`}
+            </text>
+          </g>
+        ))}
+
+        {validItems.map((item, idx) => {
+          const cx = pad.left + slotW * idx + slotW / 2;
+          const barH = (item.value / niceMax) * plotH;
+          const barY = pad.top + plotH - barH;
+          const pct = Math.round((item.value / total) * 100);
+          const color = PALETTE[idx % PALETTE.length];
+          const isHovered = hoverIdx === idx;
+
+          return (
+            <g
+              key={item.label}
+              onMouseEnter={() => setHoverIdx(idx)}
+              className="cursor-pointer"
+            >
+              <rect
+                x={pad.left + slotW * idx}
+                y={pad.top}
+                width={slotW}
+                height={plotH}
+                fill="transparent"
+              />
+              <rect
+                x={cx - barW / 2}
+                y={barY}
+                width={barW}
+                height={Math.max(2, barH)}
+                rx={4}
+                fill={color}
+                opacity={hoverIdx === null || isHovered ? 0.92 : 0.45}
+                style={{
+                  transform: animateIn ? 'scaleY(1)' : 'scaleY(0)',
+                  transformOrigin: `0px ${pad.top + plotH}px`,
+                  transition: 'transform 450ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease',
+                }}
+              />
+
+              <text
+                x={cx}
+                y={barY - 6}
+                textAnchor="middle"
+                className={`text-[9.5px] font-mono transition-opacity duration-300 ${
+                  animateIn ? 'opacity-100' : 'opacity-0'
+                } ${isHovered ? 'fill-slate-900 font-bold' : 'fill-slate-600 font-semibold'}`}
+              >
+                {formatMoney(item.value, currency)} ({pct}%)
+              </text>
+
+              <text
+                x={cx}
+                y={height - 10}
+                textAnchor="middle"
+                className={`text-[10px] ${isHovered ? 'fill-slate-900 font-bold' : 'fill-slate-600 font-medium'}`}
+              >
+                {item.label.length > 13 ? `${item.label.slice(0, 12)}…` : item.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 };

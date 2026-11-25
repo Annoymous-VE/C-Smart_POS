@@ -5,7 +5,7 @@ import { formatMoney } from '../utils';
 import { Language, translations, translateProductName, translateExpenseCategory } from '../i18n';
 import { BarChart3, Download, TrendingUp, Percent, Receipt, CheckCircle2, Calendar, Loader2 } from 'lucide-react';
 import { Badge, Card, StatCard } from '../components/ui';
-import { TrendBarLineChart, DonutChart, HorizontalBarList } from '../components/charts/AnalyticsCharts';
+import { TrendBarLineChart, PieChart, VerticalBarChart } from '../components/charts/AnalyticsCharts';
 
 interface ReportsViewProps {
   branchId: number;
@@ -176,10 +176,9 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ branchId, currency, la
           title={t.chartPaymentTitle}
           subtitle={t.chartPaymentSub}
         >
-          <DonutChart
+          <VerticalBarChart
             items={paymentEntries.map(([label, value]) => ({ label, value }))}
             currency={currency}
-            totalLabel={t.chartTotalLabel}
             noDataLabel={t.chartNoData}
           />
         </Card>
@@ -188,14 +187,14 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ branchId, currency, la
           title={t.chartExpenseTitle}
           subtitle={t.chartExpenseSub}
         >
-          <HorizontalBarList
+          <PieChart
             items={expenseEntries.map(([cat, amount]) => ({
               label: translateExpenseCategory(cat, lang),
               value: amount,
             }))}
             currency={currency}
+            totalLabel={t.chartTotalLabel}
             noDataLabel={t.chartNoData}
-            barColor="palette"
           />
         </Card>
       </div>
